@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
                 exit(-1);
 
             case 0:
-                exit(handle_auth(session));
+                exit(handle_auth(session, port));
 
             default:
                 break;

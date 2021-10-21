@@ -35,7 +35,7 @@ static int *get_client_ip(struct connection *c) {
 
 /* Write interesting information about a connection attempt to  LOGFILE. 
  * Returns -1 on error. */
-static int log_attempt(struct connection *c) {
+static int log_attempt(struct connection *c, int port) {
     FILE *f;
     int r;
 
@@ -58,14 +58,14 @@ static int log_attempt(struct connection *c) {
     c->pass = ssh_message_auth_password(c->message);
 
     if (DEBUG) { printf("%s %s %s %s\n", c->con_time, c->client_ip, c->user, c->pass); }
-    r = fprintf(f, "%s\t%s\t%s\t%s\t\n", c->con_time, c->client_ip, c->user, c->pass);
+    r = fprintf(f, "%s\t%s\t%s\t%s\t%05d\t\n", c->con_time, c->client_ip, c->user, c->pass, port);
     fclose(f);
     return r;
 }
 
 
 /* Logs password auth attempts. Always replies with SSH_MESSAGE_USERAUTH_FAILURE. */
-int handle_auth(ssh_session session) {
+int handle_auth(ssh_session session, int port) {
     struct connection con;
     con.session = session;
 
@@ -85,7 +85,7 @@ int handle_auth(ssh_session session) {
 
         /* Log the authentication request and disconnect. */
         if (ssh_message_subtype(con.message) == SSH_AUTH_METHOD_PASSWORD) {
-                log_attempt(&con);
+                log_attempt(&con, port);
         }
         else {
             if (DEBUG) { fprintf(stderr, "Not a password authentication attempt.\n"); }

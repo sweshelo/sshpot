@@ -14,6 +14,6 @@ struct connection {
     char *pass;
 };
 
-int handle_auth(ssh_session session);
+int handle_auth(ssh_session session, int port);
 
 #endif
